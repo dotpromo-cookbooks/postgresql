@@ -20,20 +20,20 @@ describe 'postgresql::apt_pgdg_postgresql' do
   include Helpers::Postgresql
 
   it 'removes the Pitti PPA sources.list' do
-    skip unless %w{debian}.include?(node['platform_family'])
-    file("/etc/apt/sources.list.d/pitti-postgresql-ppa").wont_exist
+    skip unless %w(debian).include?(node['platform_family'])
+    file('/etc/apt/sources.list.d/pitti-postgresql-ppa').wont_exist
   end
   it 'creates the PGDG apt sources.list' do
-    skip unless %w{debian}.include?(node['platform_family'])
-    file("/etc/apt/sources.list.d/apt.postgresql.org.list").must_exist
+    skip unless %w(debian).include?(node['platform_family'])
+    file('/etc/apt/sources.list.d/apt.postgresql.org.list').must_exist
   end
 
-  it "installs proper postgresql-client version" do
+  it 'installs proper postgresql-client version' do
     package("postgresql-client-#{node['postgresql']['version']}").must_be_installed
   end
 
-  it "makes psql with proper version available" do
-    psql = shell_out("psql --version")
+  it 'makes psql with proper version available' do
+    psql = shell_out('psql --version')
     assert psql.stdout.include?("psql (PostgreSQL) #{node['postgresql']['version']}")
   end
 end
