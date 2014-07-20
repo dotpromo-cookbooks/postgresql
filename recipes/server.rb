@@ -48,8 +48,10 @@ end
 # Include the right "family" recipe for installing the server
 # since they do things slightly differently.
 case node['platform_family']
-when "rhel", "fedora", "suse"
+when "rhel", "fedora"
   include_recipe "postgresql::server_redhat"
+when "suse", "opensuse"
+  include_recipe "postgresql::server_suse"
 when "debian"
   include_recipe "postgresql::server_debian"
 end
@@ -66,6 +68,12 @@ if node['postgresql']['version'].to_f < 9.2 && node['postgresql']['config'].attr
   link ::File.join(node['postgresql']['config']['data_directory'], 'server.key') do
     to node['postgresql']['config']['ssl_key_file']
   end
+end
+
+service "postgresql" do
+  service_name node['postgresql']['server']['service_name']
+  supports :restart => true, :status => true, :reload => true
+  action [:enable, :start]
 end
 
 # NOTE: Consider two facts before modifying "assign-postgres-password":

@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: postgresql
-# Recipe:: server
+# Recipe:: server_redhat
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,11 +23,21 @@ dir = node['postgresql']['dir']
 initdb_locale = node['postgresql']['initdb_locale']
 version = node['postgresql']['version']
 
+# Create a group and user like the package will.
+# Otherwise the templates fail.
+create_rpm_user_and_group
+create_data_dir
+
+install_server_packages
+
 if systemd?
-  unless data_dir == "/var/lib/pgsql/#{version}/data"
-    template "/etc/systemd/system/postgresql-#{version}.service" do
+  unless dir == "/var/lib/pgsql/#{version}/data"
+    path = 'postgresql'
+    path << "-#{version}" if node['postgresql']['enable_pgdg_yum']
+    template "/etc/systemd/system/#{path}.service" do
       source "postgresql.service.erb"
       mode "0644"
+      variables path: path
     end
   end
 else

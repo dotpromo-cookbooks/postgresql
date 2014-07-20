@@ -123,18 +123,33 @@ when "redhat", "centos", "scientific", "oracle"
 when "suse"
 
   if node['platform_version'].to_f <= 11.1
-    default['postgresql']['version'] = "8.3"
-    default['postgresql']['client']['packages'] = ['postgresql', 'rubygem-pg']
-    default['postgresql']['server']['packages'] = ['postgresql-server']
-    default['postgresql']['contrib']['packages'] = ['postgresql-contrib']
+    default['postgresql']['client']['packages'] = %w{postgresql-devel}
+    default['postgresql']['server']['packages'] = %w{postgresql-server}
+    default['postgresql']['contrib']['packages'] = %w{postgresql-contrib}
   else
     default['postgresql']['version'] = "9.1"
-    default['postgresql']['client']['packages'] = ['postgresql91', 'rubygem-pg']
-    default['postgresql']['server']['packages'] = ['postgresql91-server']
-    default['postgresql']['contrib']['packages'] = ['postgresql91-contrib']
+    default['postgresql']['client']['packages'] = ["postgresql#{node['postgresql']['version'].split('.').join}-devel"]
+    default['postgresql']['server']['packages'] = ["postgresql#{node['postgresql']['version'].split('.').join}-server"]
+    default['postgresql']['contrib']['packages'] = ["postgresql#{node['postgresql']['version'].split('.').join}-contrib"]
   end
 
   default['postgresql']['dir'] = "/var/lib/pgsql/data"
+  default['postgresql']['server']['service_name'] = "postgresql"
+
+when "opensuse"
+  platform_version = node['platform_version'].to_f
+  default['postgresql']['version'] = case
+  when platform_version <= 11.4
+    "9.0"
+  when platform_version <= 12.2
+    "9.1"
+  else
+    "9.2"
+  end
+  default['postgresql']['dir'] = "/var/lib/pgsql/data"
+  default['postgresql']['client']['packages'] = %w{postgresql-devel}
+  default['postgresql']['server']['packages'] = %w{postgresql-server}
+  default['postgresql']['contrib']['packages'] = %w{postgresql-contrib}
   default['postgresql']['server']['service_name'] = "postgresql"
 
 else
