@@ -1,9 +1,8 @@
 #
 # Cookbook Name:: postgresql
-# Recipe:: server_redhat
+# Recipe:: server_suse
 #
-# Author:: Joshua Timberman (<joshua@opscode.com>)
-# Author:: Lamont Granquist (<lamont@opscode.com>)
+# Author:: Alexander Simonov (<alex@simonov.me>)
 # Copyright 2009-2011, Opscode, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,40 +21,17 @@
 include_recipe "postgresql::client"
 
 ::Chef::Recipe.send(:include, Opscode::PostgresqlHelpers)
-
-version = node['postgresql']['version']
 data_dir = node['postgresql']['dir']
 
 # Create a group and user like the package will.
 # Otherwise the templates fail.
 create_rpm_user_and_group
 create_data_dir
-
 install_server_packages
 
-if systemd?
-  unless data_dir == "/var/lib/pgsql/#{version}/data"
-    path = 'postgresql'
-    path << "-#{version}" if node['postgresql']['enable_pgdg_yum']
-    template "/etc/systemd/system/#{path}.service" do
-      source "postgresql.service.erb"
-      mode "0644"
-      variables path: path
-    end
-  end
-else
-  template "/etc/sysconfig/pgsql/#{node['postgresql']['server']['service_name']}" do
-    source "pgsql.sysconfig.erb"
-    mode "0644"
-    notifies :restart, "service[postgresql]", :delayed
-  end
-end
+execute "sed -i 's|POSTGRES_DATADIR=\".*\"|POSTGRES_DATADIR=\"#{data_dir}\"|' /etc/sysconfig/postgresql"
 
-setup_command = if systemd?
-                  systemd_initdb_cmd
-                else
-                  sysinit_initdb_cmd
-                end
+setup_command = "su - postgres -c \"/usr/bin/initdb --locale=#{node['postgresql']['initdb_locale']} --auth='ident' #{data_dir}\""
 execute setup_command do
   not_if { ::FileTest.exist?(File.join(data_dir, "PG_VERSION")) }
 end

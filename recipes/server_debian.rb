@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: postgresql
-# Recipe:: server
+# Recipe:: server_debian
 #
 # Author:: Joshua Timberman (<joshua@opscode.com>)
 # Author:: Lamont Granquist (<lamont@opscode.com>)#
@@ -21,19 +21,8 @@
 
 include_recipe "postgresql::client"
 
-node['postgresql']['server']['packages'].each do |pg_pack|
-  package pg_pack
-end
+::Chef::Recipe.send(:include, Opscode::PostgresqlHelpers)
 
-directory node['postgresql']['dir'] do
-  owner "postgres"
-  group "postgres"
-  recursive true
-  action :create
-end
+install_server_packages
 
-service "postgresql" do
-  service_name node['postgresql']['server']['service_name']
-  supports :restart => true, :status => true, :reload => true
-  action [:enable, :start]
-end
+create_data_dir
