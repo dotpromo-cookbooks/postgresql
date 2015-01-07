@@ -19,6 +19,8 @@ platforms:
   run_list:
   - recipe[apt]
 
+- name: centos-7.0
+
 - name: centos-6.4
 
 - name: centos-7.0
@@ -52,7 +54,7 @@ suites:
   attributes:
     postgresql:
       enable_pgdg_apt: true
-      version: "9.3"
+      version: "9.4"
 
 - name: yum-pgdg-client
   run_list:
@@ -62,9 +64,9 @@ suites:
   attributes:
     postgresql:
       enable_pgdg_yum: true
-      version: "9.3"
+      version: "9.4"
       client:
-        packages: ["postgresql93"]
+        packages: ["postgresql94"]
 
 - name: ruby
   run_list:
@@ -91,7 +93,7 @@ suites:
   attributes:
     postgresql:
       enable_pgdg_apt: true
-      version: "9.3"
+      version: "9.4"
       password:
         postgres: "iloverandompasswordsbutthiswilldo"
       config:
@@ -107,10 +109,10 @@ suites:
   attributes:
     postgresql:
       enable_pgdg_yum: true
-      version: "9.3"
+      version: "9.4"
       server:
-        packages: ["postgresql93-server"]
-        service_name: "postgresql-9.3"
+        packages: ["postgresql94-server"]
+        service_name: "postgresql-9.4"
       password:
         postgres: "iloverandompasswordsbutthiswilldo"
 
@@ -152,7 +154,7 @@ suites:
   attributes:
     postgresql:
       enable_pgdg_apt: true
-      version: "9.3"
+      version: "9.4"
 
 - name: yum-pgdg-client-ruby
   run_list:
@@ -163,6 +165,6 @@ suites:
   attributes:
     postgresql:
       enable_pgdg_yum: true
-      version: "9.3"
+      version: "9.4"
       client:
-        packages: ["postgresql93", "postgresql93-devel"]
+        packages: ["postgresql94", "postgresql94-devel"]
